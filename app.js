@@ -2,6 +2,7 @@
 const firebaseConfig = {
   apiKey: "AIzaSyC0TMmqqIyH8GCt9FXbqbFv3zwJQncW4AQ",
   authDomain: "control-de-viajes-mixers.firebaseapp.com",
+  databaseURL: "https://control-de-viajes-mixers-default-rtdb.firebaseio.com/",
   projectId: "control-de-viajes-mixers",
   storageBucket: "control-de-viajes-mixers.firebasestorage.app",
   messagingSenderId: "100547620302",
@@ -15,8 +16,8 @@ const db = firebase.database();
 
 // -------- LOGIN --------
 function login() {
-    let user = document.getElementById("user").value;
-    let pass = document.getElementById("pass").value;
+    const user = document.getElementById("user").value.trim();
+    const pass = document.getElementById("pass").value.trim();
 
     if (user === "admin" && pass === "1234") {
         document.getElementById("login-screen").classList.add("hidden");
@@ -30,35 +31,42 @@ function login() {
 
 // -------- INICIAR DÍA --------
 function iniciarDia() {
-    let hoy = new Date().toISOString().slice(0, 10);
+    const hoy = new Date().toISOString().slice(0, 10);
     document.getElementById("fecha").value = hoy;
 }
 
 // -------- REGISTRO DE VIAJES --------
 function registrarViaje() {
-    let fecha = document.getElementById("fecha").value;
-    let conductor = document.getElementById("conductor").value.trim();
-    let placa = document.getElementById("placa").value.trim();
-    let inicioCarga = document.getElementById("inicioCarga").value;
-    let finCarga = document.getElementById("finCarga").value;
-    let inicioDescarga = document.getElementById("inicioDescarga").value;
-    let finDescarga = document.getElementById("finDescarga").value;
+    const fecha = document.getElementById("fecha").value;
+    const conductor = document.getElementById("conductor").value.trim();
+    const placa = document.getElementById("placa").value.trim();
+    const inicioCarga = document.getElementById("inicioCarga").value;
+    const finCarga = document.getElementById("finCarga").value;
+    const inicioDescarga = document.getElementById("inicioDescarga").value;
+    const finDescarga = document.getElementById("finDescarga").value;
 
     if (!fecha || !conductor || !placa || !inicioCarga || !finCarga || !inicioDescarga || !finDescarga) {
         alert("Por favor complete todos los campos.");
         return;
     }
 
-    let viaje = { fecha, conductor, placa, inicioCarga, finCarga, inicioDescarga, finDescarga };
-    db.ref('viajes').push(viaje);
+    const viaje = { fecha, conductor, placa, inicioCarga, finCarga, inicioDescarga, finDescarga };
 
-    // Limpiar campos
-    document.getElementById("conductor").value = "";
-    document.getElementById("placa").value = "";
-    document.getElementById("inicioCarga").value = "";
-    document.getElementById("finCarga").value = "";
-    document.getElementById("inicioDescarga").value = "";
-    document.getElementById("finDescarga").value = "";
+    // Guardar en Firebase
+    db.ref('viajes').push(viaje)
+      .then(() => {
+        document.getElementById("conductor").value = "";
+        document.getElementById("placa").value = "";
+        document.getElementById("inicioCarga").value = "";
+        document.getElementById("finCarga").value = "";
+        document.getElementById("inicioDescarga").value = "";
+        document.getElementById("finDescarga").value = "";
+        console.log("Viaje registrado correctamente");
+      })
+      .catch((error) => {
+        console.error("Error al registrar el viaje: ", error);
+        alert("Error al registrar el viaje: " + error);
+      });
 }
 
 // -------- ELIMINAR VIAJE --------
@@ -84,7 +92,7 @@ function escucharViajes() {
 
 // -------- CARGAR TABLA --------
 function cargarViajes() {
-    let tbody = document.querySelector("#tablaViajes tbody");
+    const tbody = document.querySelector("#tablaViajes tbody");
     tbody.innerHTML = "";
 
     let totalDia = 0;
@@ -94,7 +102,7 @@ function cargarViajes() {
         totalDia++;
         totalConductores[v.conductor] = (totalConductores[v.conductor] || 0) + 1;
 
-        let fila = document.createElement("tr");
+        const fila = document.createElement("tr");
         fila.innerHTML = `
             <td data-label="Fecha">${v.fecha}</td>
             <td data-label="Conductor">${v.conductor}</td>
@@ -110,7 +118,7 @@ function cargarViajes() {
 
     document.getElementById("totalDia").innerText = totalDia;
 
-    let lista = document.getElementById("totalConductores");
+    const lista = document.getElementById("totalConductores");
     lista.innerHTML = "";
     Object.keys(totalConductores).forEach(c => {
         lista.innerHTML += `<li>${c}: ${totalConductores[c]} viajes</li>`;
@@ -124,9 +132,9 @@ function exportarExcel() {
         csv += `"${v.fecha}","${v.conductor}","${v.placa}","${v.inicioCarga}","${v.finCarga}","${v.inicioDescarga}","${v.finDescarga}"\n`;
     });
 
-    let blob = new Blob([csv], { type: "text/csv" });
-    let url = URL.createObjectURL(blob);
-    let a = document.createElement("a");
+    const blob = new Blob([csv], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
     a.href = url;
     a.download = "viajes.csv";
     a.click();
@@ -138,6 +146,6 @@ function compartirWhatsApp() {
     viajes.forEach(v => {
         mensaje += `${v.fecha} - ${v.conductor} - ${v.placa}\n`;
     });
-    let url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
+    const url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
     window.open(url, "_blank");
 }
