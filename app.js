@@ -63,20 +63,22 @@ function cargarViajes() {
 
         let fila = document.createElement("tr");
         fila.innerHTML = `
-            <td>${v.fecha}</td>
-            <td>${v.conductor}</td>
-            <td>${v.placa}</td>
-            <td>${v.inicioCarga}</td>
-            <td>${v.finCarga}</td>
-            <td>${v.inicioDescarga}</td>
-            <td>${v.finDescarga}</td>
-            <td><button onclick="eliminarViaje(${i})">Borrar</button></td>
+            <td data-label="Fecha">${v.fecha}</td>
+            <td data-label="Conductor">${v.conductor}</td>
+            <td data-label="Placa">${v.placa}</td>
+            <td data-label="Inicio Carga">${v.inicioCarga}</td>
+            <td data-label="Fin Carga">${v.finCarga}</td>
+            <td data-label="Inicio Descarga">${v.inicioDescarga}</td>
+            <td data-label="Fin Descarga">${v.finDescarga}</td>
+            <td data-label="Acción"><button onclick="eliminarViaje(${i})">Borrar</button></td>
         `;
         tbody.appendChild(fila);
     });
 
+    // Total de viajes del día
     document.getElementById("totalDia").innerText = totalDia;
 
+    // Total de viajes por conductor
     let lista = document.getElementById("totalConductores");
     lista.innerHTML = "";
     Object.keys(totalConductores).forEach(c => {
