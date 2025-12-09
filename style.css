@@ -88,7 +88,6 @@ tr:hover {
     font-size: 14px;
 }
 
-/* --- Estilo de la lista de totales por conductor --- */
 #totalConductores {
     list-style-type: none;
     padding: 0;
@@ -104,7 +103,6 @@ tr:hover {
     color: #1e2d42;
 }
 
-/* --- Responsividad --- */
 @media screen and (max-width: 768px) {
     .form-section,
     .tabla-section,
@@ -119,7 +117,7 @@ tr:hover {
     }
 
     thead tr {
-        display: none; /* Oculta encabezado en móvil */
+        display: none;
     }
 
     td {
