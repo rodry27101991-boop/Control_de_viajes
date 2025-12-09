@@ -30,24 +30,17 @@
 
 <section class="form-section">
     <h2>Registrar Viaje</h2>
-
     <input id="fecha" type="date">
-
     <input id="conductor" type="text" placeholder="Nombre del Conductor">
     <input id="placa" type="text" placeholder="Placa del Camión">
-
     <label>Inicio de Carga</label>
     <input id="inicioCarga" type="time">
-
     <label>Fin de Carga</label>
     <input id="finCarga" type="time">
-
     <label>Inicio de Descarga</label>
     <input id="inicioDescarga" type="time">
-
     <label>Fin de Descarga</label>
     <input id="finDescarga" type="time">
-
     <button onclick="registrarViaje()">Registrar Viaje</button>
 </section>
 
@@ -63,6 +56,7 @@
                 <th>Fin Carga</th>
                 <th>Inicio Descarga</th>
                 <th>Fin Descarga</th>
+                <th>Acción</th>
             </tr>
         </thead>
         <tbody></tbody>
@@ -71,13 +65,8 @@
 
 <section class="totales">
     <h3>Total de viajes del día: <span id="totalDia">0</span></h3>
-
     <h3>Total por conductor:</h3>
     <ul id="totalConductores"></ul>
-
-    <h3>Total general de todos los conductores:  
-        <span id="totalGeneral">0</span>
-    </h3>
 </section>
 
 <section class="botones">
