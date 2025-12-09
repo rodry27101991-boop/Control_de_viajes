@@ -1,0 +1,80 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f3f3f3;
+}
+
+header {
+    background: #1e2d42;
+    padding: 15px;
+    color: white;
+    text-align: center;
+}
+
+.logo {
+    width: 90px;
+    display: block;
+    margin: auto;
+}
+
+.logo-login {
+    width: 130px;
+    display: block;
+    margin: auto;
+}
+
+.form-section,
+.tabla-section,
+.totales,
+.botones {
+    background: white;
+    padding: 15px;
+    margin: 10px;
+    border-radius: 10px;
+}
+
+input, button {
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0;
+    border-radius: 6px;
+    border: 1px solid #999;
+}
+
+button {
+    background: #1e2d42;
+    color: white;
+    font-weight: bold;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td, th {
+    border: 1px solid #aaa;
+    padding: 6px;
+}
+
+.hidden {
+    display: none;
+}
+
+.login-box {
+    width: 85%;
+    margin: 80px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    text-align: center;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+}

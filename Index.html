@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de Viajes Mixers</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+    <div class="login-box">
+        <img src="https://i.postimg.cc/YSQ4r3kb/mixer-logo.png" class="logo-login">
+        <h2>Iniciar Sesión</h2>
+        <input id="user" type="text" placeholder="Usuario">
+        <input id="pass" type="password" placeholder="Contraseña">
+        <button onclick="login()">Entrar</button>
+        <p id="login-error" class="error"></p>
+    </div>
+</div>
+
+<!-- PANTALLA PRINCIPAL -->
+<div id="main-screen" class="hidden">
+
+<header>
+    <img src="https://i.postimg.cc/YSQ4r3kb/mixer-logo.png" class="logo">
+    <h1>Control de Viajes Mixers</h1>
+</header>
+
+<section class="form-section">
+    <h2>Registrar Viaje</h2>
+
+    <input id="fecha" type="date">
+
+    <input id="conductor" type="text" placeholder="Nombre del Conductor">
+    <input id="placa" type="text" placeholder="Placa del Camión">
+
+    <label>Inicio de Carga</label>
+    <input id="inicioCarga" type="time">
+
+    <label>Fin de Carga</label>
+    <input id="finCarga" type="time">
+
+    <label>Inicio de Descarga</label>
+    <input id="inicioDescarga" type="time">
+
+    <label>Fin de Descarga</label>
+    <input id="finDescarga" type="time">
+
+    <button onclick="registrarViaje()">Registrar Viaje</button>
+</section>
+
+<section class="tabla-section">
+    <h2>Viajes del Día</h2>
+    <table id="tablaViajes">
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Conductor</th>
+                <th>Placa</th>
+                <th>Inicio Carga</th>
+                <th>Fin Carga</th>
+                <th>Inicio Descarga</th>
+                <th>Fin Descarga</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+</section>
+
+<section class="totales">
+    <h3>Total de viajes del día: <span id="totalDia">0</span></h3>
+
+    <h3>Total por conductor:</h3>
+    <ul id="totalConductores"></ul>
+
+    <h3>Total general de todos los conductores:  
+        <span id="totalGeneral">0</span>
+    </h3>
+</section>
+
+<section class="botones">
+    <button onclick="exportarExcel()">Exportar a Excel</button>
+    <button onclick="compartirWhatsApp()">Compartir por WhatsApp</button>
+</section>
+
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
