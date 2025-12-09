@@ -6,90 +6,93 @@ function login() {
     if (user === "admin" && pass === "1234") {
         document.getElementById("login-screen").classList.add("hidden");
         document.getElementById("main-screen").classList.remove("hidden");
-        cargarViajes();
+        iniciarDia();
     } else {
         document.getElementById("login-error").innerText = "Usuario o contraseña incorrectos";
     }
 }
 
+// -------- INICIAR DÍA --------
+let viajes = [];
+function iniciarDia() {
+    let hoy = new Date().toISOString().slice(0, 10);
+    document.getElementById("fecha").value = hoy;
+    cargarViajes(); // inicia tabla vacía
+}
+
 // -------- REGISTRO DE VIAJES --------
-let viajes = JSON.parse(localStorage.getItem("viajes")) || [];
-
 function registrarViaje() {
-    let viaje = {
-        fecha: document.getElementById("fecha").value,
-        conductor: document.getElementById("conductor").value,
-        placa: document.getElementById("placa").value,
-        inicioCarga: document.getElementById("inicioCarga").value,
-        finCarga: document.getElementById("finCarga").value,
-        inicioDescarga: document.getElementById("inicioDescarga").value,
-        finDescarga: document.getElementById("finDescarga").value
-    };
+    let fecha = document.getElementById("fecha").value;
+    let conductor = document.getElementById("conductor").value.trim();
+    let placa = document.getElementById("placa").value.trim();
+    let inicioCarga = document.getElementById("inicioCarga").value;
+    let finCarga = document.getElementById("finCarga").value;
+    let inicioDescarga = document.getElementById("inicioDescarga").value;
+    let finDescarga = document.getElementById("finDescarga").value;
 
+    if (!fecha || !conductor || !placa || !inicioCarga || !finCarga || !inicioDescarga || !finDescarga) {
+        alert("Por favor complete todos los campos.");
+        return;
+    }
+
+    let viaje = { fecha, conductor, placa, inicioCarga, finCarga, inicioDescarga, finDescarga };
     viajes.push(viaje);
-    localStorage.setItem("viajes", JSON.stringify(viajes));
 
     cargarViajes();
 }
 
-// ---- CARGAR TABLA ----
+// -------- ELIMINAR VIAJE --------
+function eliminarViaje(index) {
+    if (confirm("¿Desea eliminar este viaje?")) {
+        viajes.splice(index, 1);
+        cargarViajes();
+    }
+}
+
+// -------- CARGAR TABLA --------
 function cargarViajes() {
     let tbody = document.querySelector("#tablaViajes tbody");
     tbody.innerHTML = "";
 
-    let fechaHoy = new Date().toISOString().slice(0, 10);
-
     let totalDia = 0;
     let totalConductores = {};
 
-    viajes.forEach(v => {
-        if (v.fecha === fechaHoy) {
-            totalDia++;
+    viajes.forEach((v, i) => {
+        totalDia++;
+        totalConductores[v.conductor] = (totalConductores[v.conductor] || 0) + 1;
 
-            if (!totalConductores[v.conductor]) {
-                totalConductores[v.conductor] = 0;
-            }
-            totalConductores[v.conductor]++;
-
-            let fila = `
-                <tr>
-                    <td>${v.fecha}</td>
-                    <td>${v.conductor}</td>
-                    <td>${v.placa}</td>
-                    <td>${v.inicioCarga}</td>
-                    <td>${v.finCarga}</td>
-                    <td>${v.inicioDescarga}</td>
-                    <td>${v.finDescarga}</td>
-                </tr>
-            `;
-            tbody.innerHTML += fila;
-        }
+        let fila = document.createElement("tr");
+        fila.innerHTML = `
+            <td>${v.fecha}</td>
+            <td>${v.conductor}</td>
+            <td>${v.placa}</td>
+            <td>${v.inicioCarga}</td>
+            <td>${v.finCarga}</td>
+            <td>${v.inicioDescarga}</td>
+            <td>${v.finDescarga}</td>
+            <td><button onclick="eliminarViaje(${i})">Borrar</button></td>
+        `;
+        tbody.appendChild(fila);
     });
 
     document.getElementById("totalDia").innerText = totalDia;
 
     let lista = document.getElementById("totalConductores");
     lista.innerHTML = "";
-
     Object.keys(totalConductores).forEach(c => {
         lista.innerHTML += `<li>${c}: ${totalConductores[c]} viajes</li>`;
     });
-
-    let totalGeneral = Object.values(totalConductores).reduce((a, b) => a + b, 0);
-    document.getElementById("totalGeneral").innerText = totalGeneral;
 }
 
 // -------- EXPORTAR EXCEL --------
 function exportarExcel() {
     let csv = "Fecha,Conductor,Placa,InicioCarga,FinCarga,InicioDescarga,FinDescarga\n";
-
     viajes.forEach(v => {
         csv += `${v.fecha},${v.conductor},${v.placa},${v.inicioCarga},${v.finCarga},${v.inicioDescarga},${v.finDescarga}\n`;
     });
 
     let blob = new Blob([csv], { type: "text/csv" });
     let url = URL.createObjectURL(blob);
-
     let a = document.createElement("a");
     a.href = url;
     a.download = "viajes.csv";
@@ -98,10 +101,10 @@ function exportarExcel() {
 
 // -------- WHATSAPP --------
 function compartirWhatsApp() {
-    let fechaHoy = new Date().toISOString().slice(0, 10);
-    let totalDia = document.getElementById("totalDia").innerText;
-    let mensaje = `Total de viajes del día ${fechaHoy}: ${totalDia}`;
-
+    let mensaje = "Viajes registrados hoy:\n";
+    viajes.forEach(v => {
+        mensaje += `${v.fecha} - ${v.conductor} - ${v.placa}\n`;
+    });
     let url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
     window.open(url, "_blank");
-        }
+}
