@@ -1,25 +1,45 @@
+// -------- VARIABLES GLOBALES --------
+let viajes = JSON.parse(localStorage.getItem("viajes")) || [];
+
 // -------- LOGIN --------
 function login() {
     let user = document.getElementById("user").value;
     let pass = document.getElementById("pass").value;
 
+    // CREDENCIALES DE EJEMPLO
     if (user === "admin" && pass === "1234") {
         document.getElementById("login-screen").classList.add("hidden");
         document.getElementById("main-screen").classList.remove("hidden");
-        cargarViajes();
+        cargarViajes(); // Carga los viajes al iniciar sesión
     } else {
         document.getElementById("login-error").innerText = "Usuario o contraseña incorrectos";
     }
 }
 
-// -------- REGISTRO DE VIAJES --------
-let viajes = JSON.parse(localStorage.getItem("viajes")) || [];
-
+// -------- REGISTRO DE VIAJES (Validado) --------
 function registrarViaje() {
+    
+    // OBTENER VALORES y VALIDAR
+    let inputFecha = document.getElementById("fecha").value;
+    let conductor = document.getElementById("conductor").value.trim();
+    let placa = document.getElementById("placa").value.trim();
+    
+    // Asignar la fecha de hoy si el campo está vacío
+    let fechaDelViaje = inputFecha;
+    if (!fechaDelViaje) {
+        fechaDelViaje = new Date().toISOString().slice(0, 10);
+    }
+    
+    // Validación estricta para evitar guardar viajes incompletos
+    if (!conductor || !placa) {
+        alert("¡Error! Debes completar el nombre del Conductor y la Placa antes de registrar el viaje.");
+        return; // Detiene la función si faltan datos
+    }
+    
     let viaje = {
-        fecha: document.getElementById("fecha").value,
-        conductor: document.getElementById("conductor").value,
-        placa: document.getElementById("placa").value,
+        fecha: fechaDelViaje,
+        conductor: conductor,
+        placa: placa,
         inicioCarga: document.getElementById("inicioCarga").value,
         finCarga: document.getElementById("finCarga").value,
         inicioDescarga: document.getElementById("inicioDescarga").value,
@@ -29,10 +49,18 @@ function registrarViaje() {
     viajes.push(viaje);
     localStorage.setItem("viajes", JSON.stringify(viajes));
 
-    cargarViajes();
+    // Limpiar campos después de registrar (opcional, para agilizar el siguiente registro)
+    document.getElementById("conductor").value = "";
+    document.getElementById("placa").value = "";
+    document.getElementById("inicioCarga").value = "";
+    document.getElementById("finCarga").value = "";
+    document.getElementById("inicioDescarga").value = "";
+    document.getElementById("finDescarga").value = "";
+
+    cargarViajes(); // Vuelve a cargar y actualiza la tabla y los contadores
 }
 
-// ---- CARGAR TABLA ----
+// ---- CARGAR TABLA Y CONTADORES ----
 function cargarViajes() {
     let tbody = document.querySelector("#tablaViajes tbody");
     tbody.innerHTML = "";
@@ -43,6 +71,7 @@ function cargarViajes() {
     let totalConductores = {};
 
     viajes.forEach(v => {
+        // Solo cuenta y muestra los viajes cuya fecha coincide con la de hoy
         if (v.fecha === fechaHoy) {
             totalDia++;
 
@@ -66,8 +95,10 @@ function cargarViajes() {
         }
     });
 
+    // 🏆 ACTUALIZACIÓN DEL CONTADOR DE HOY (clave para WhatsApp)
     document.getElementById("totalDia").innerText = totalDia;
 
+    // Actualización de totales por conductor
     let lista = document.getElementById("totalConductores");
     lista.innerHTML = "";
 
@@ -75,7 +106,8 @@ function cargarViajes() {
         lista.innerHTML += `<li>${c}: ${totalConductores[c]} viajes</li>`;
     });
 
-    let totalGeneral = Object.values(totalConductores).reduce((a, b) => a + b, 0);
+    // Cálculo del total general (de todos los viajes guardados, sin importar la fecha)
+    let totalGeneral = viajes.length; // Cambiado para contar todos los viajes en localStorage
     document.getElementById("totalGeneral").innerText = totalGeneral;
 }
 
@@ -96,10 +128,12 @@ function exportarExcel() {
     a.click();
 }
 
-// -------- WHATSAPP --------
+// -------- WHATSAPP (Sin cambios, ya estaba correcto) --------
 function compartirWhatsApp() {
+    // ⚠️ Asegúrate de llamar a cargarViajes() justo antes de esto si dudas de que el contador esté actualizado
     let fechaHoy = new Date().toISOString().slice(0, 10);
-    let totalDia = document.getElementById("totalDia").innerText;
+    // Obtiene el número que se muestra en pantalla
+    let totalDia = document.getElementById("totalDia").innerText; 
     let mensaje = `Total de viajes del día ${fechaHoy}: ${totalDia}`;
 
     let url = `https://wa.me/?text=${encodeURIComponent(mensaje)}`;
