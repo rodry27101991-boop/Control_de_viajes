@@ -76,15 +76,18 @@ function eliminarViaje(key) {
     }
 }
 
-// -------- ESCUCHAR VIAJES EN TIEMPO REAL --------
+// -------- ESCUCHAR VIAJES DEL DÍA (REINICIO AUTOMÁTICO) --------
 let viajes = [];
 function escucharViajes() {
+    const hoy = new Date().toISOString().slice(0, 10); // Fecha actual
     db.ref('viajes').on('value', snapshot => {
         viajes = [];
         snapshot.forEach(child => {
             let v = child.val();
             v.key = child.key;
-            viajes.push(v);
+            if (v.fecha === hoy) { // Filtra solo viajes del día
+                viajes.push(v);
+            }
         });
         cargarViajes();
     });
