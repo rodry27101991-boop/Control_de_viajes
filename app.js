@@ -1,3 +1,18 @@
+// -------- CONFIGURACIÓN FIREBASE --------
+const firebaseConfig = {
+  apiKey: "AIzaSyC0TMmqqIyH8GCt9FXbqbFv3zwJQncW4AQ",
+  authDomain: "control-de-viajes-mixers.firebaseapp.com",
+  projectId: "control-de-viajes-mixers",
+  storageBucket: "control-de-viajes-mixers.firebasestorage.app",
+  messagingSenderId: "100547620302",
+  appId: "1:100547620302:web:1a16d80e0132cce7a3cf9f",
+  measurementId: "G-DNRQT6790F"
+};
+
+// Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
 // -------- LOGIN --------
 function login() {
     let user = document.getElementById("user").value;
@@ -7,17 +22,16 @@ function login() {
         document.getElementById("login-screen").classList.add("hidden");
         document.getElementById("main-screen").classList.remove("hidden");
         iniciarDia();
+        escucharViajes();
     } else {
         document.getElementById("login-error").innerText = "Usuario o contraseña incorrectos";
     }
 }
 
 // -------- INICIAR DÍA --------
-let viajes = [];
 function iniciarDia() {
     let hoy = new Date().toISOString().slice(0, 10);
     document.getElementById("fecha").value = hoy;
-    cargarViajes(); // inicia tabla vacía
 }
 
 // -------- REGISTRO DE VIAJES --------
@@ -36,17 +50,36 @@ function registrarViaje() {
     }
 
     let viaje = { fecha, conductor, placa, inicioCarga, finCarga, inicioDescarga, finDescarga };
-    viajes.push(viaje);
+    db.ref('viajes').push(viaje);
 
-    cargarViajes();
+    // Limpiar campos
+    document.getElementById("conductor").value = "";
+    document.getElementById("placa").value = "";
+    document.getElementById("inicioCarga").value = "";
+    document.getElementById("finCarga").value = "";
+    document.getElementById("inicioDescarga").value = "";
+    document.getElementById("finDescarga").value = "";
 }
 
 // -------- ELIMINAR VIAJE --------
-function eliminarViaje(index) {
+function eliminarViaje(key) {
     if (confirm("¿Desea eliminar este viaje?")) {
-        viajes.splice(index, 1);
-        cargarViajes();
+        db.ref('viajes/' + key).remove();
     }
+}
+
+// -------- ESCUCHAR VIAJES EN TIEMPO REAL --------
+let viajes = [];
+function escucharViajes() {
+    db.ref('viajes').on('value', snapshot => {
+        viajes = [];
+        snapshot.forEach(child => {
+            let v = child.val();
+            v.key = child.key;
+            viajes.push(v);
+        });
+        cargarViajes();
+    });
 }
 
 // -------- CARGAR TABLA --------
@@ -57,7 +90,7 @@ function cargarViajes() {
     let totalDia = 0;
     let totalConductores = {};
 
-    viajes.forEach((v, i) => {
+    viajes.forEach((v) => {
         totalDia++;
         totalConductores[v.conductor] = (totalConductores[v.conductor] || 0) + 1;
 
@@ -70,15 +103,13 @@ function cargarViajes() {
             <td data-label="Fin Carga">${v.finCarga}</td>
             <td data-label="Inicio Descarga">${v.inicioDescarga}</td>
             <td data-label="Fin Descarga">${v.finDescarga}</td>
-            <td data-label="Acción"><button onclick="eliminarViaje(${i})">Borrar</button></td>
+            <td data-label="Acción"><button onclick="eliminarViaje('${v.key}')">Borrar</button></td>
         `;
         tbody.appendChild(fila);
     });
 
-    // Total de viajes del día
     document.getElementById("totalDia").innerText = totalDia;
 
-    // Total de viajes por conductor
     let lista = document.getElementById("totalConductores");
     lista.innerHTML = "";
     Object.keys(totalConductores).forEach(c => {
@@ -90,7 +121,7 @@ function cargarViajes() {
 function exportarExcel() {
     let csv = "Fecha,Conductor,Placa,InicioCarga,FinCarga,InicioDescarga,FinDescarga\n";
     viajes.forEach(v => {
-        csv += `${v.fecha},${v.conductor},${v.placa},${v.inicioCarga},${v.finCarga},${v.inicioDescarga},${v.finDescarga}\n`;
+        csv += `"${v.fecha}","${v.conductor}","${v.placa}","${v.inicioCarga}","${v.finCarga}","${v.inicioDescarga}","${v.finDescarga}"\n`;
     });
 
     let blob = new Blob([csv], { type: "text/csv" });
