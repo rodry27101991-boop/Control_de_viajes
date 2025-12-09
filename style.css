@@ -45,10 +45,12 @@ button {
     background: #1e2d42;
     color: white;
     font-weight: bold;
+    cursor: pointer;
+    transition: 0.3s;
 }
 
 button:hover {
-    opacity: 0.8;
+    opacity: 0.85;
 }
 
 table {
@@ -59,6 +61,11 @@ table {
 td, th {
     border: 1px solid #aaa;
     padding: 6px;
+    text-align: center;
+}
+
+tr:hover {
+    background-color: #e0e0e0;
 }
 
 .hidden {
@@ -67,6 +74,7 @@ td, th {
 
 .login-box {
     width: 85%;
+    max-width: 400px;
     margin: 80px auto;
     background: white;
     padding: 20px;
